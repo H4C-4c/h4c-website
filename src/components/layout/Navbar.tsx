@@ -7,7 +7,6 @@ import Link from 'next/link';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [aboutDropdownOpen, setAboutDropdownOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-md">
@@ -22,12 +21,11 @@ export default function Navbar() {
             Home
           </Link>
 
-          {/* About Dropdown Wrapper */}
+          {/* About Dropdown */}
           <div className="relative group">
             <button className="flex items-center gap-1 text-sm font-medium text-gray-700 hover:text-jungle transition">
               About <ChevronDown size={16} />
             </button>
-
             <div className="absolute top-full left-0 mt-2 w-48 bg-white shadow-lg rounded-md z-50 border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
               <Link
                 href="/about/who-we-are"
