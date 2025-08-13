@@ -12,10 +12,11 @@ const client = createClient({
 export async function getPrograms() {
   const entries = await client.getEntries({ content_type: 'ourPrograms' });
   return entries.items.map((item) => ({
-    title: item.fields.title,
-    description: item.fields.description,
-    imageUrl: item.fields.image?.fields?.file?.url
-      ? 'https:' + item.fields.image.fields.file.url
-      : '',
+    title: typeof item.fields.title === 'string' ? item.fields.title : '',
+    description: typeof item.fields.description === 'string' ? item.fields.description : '',
+    imageUrl:
+      item.fields.image?.fields?.file?.url && typeof item.fields.image.fields.file.url === 'string'
+        ? 'https:' + item.fields.image.fields.file.url
+        : '',
   }));
 }
