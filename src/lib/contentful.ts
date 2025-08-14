@@ -1,31 +1,28 @@
-import { Entry, Asset, EntrySkeletonType } from "contentful";
+import { createClient } from 'contentful';
 
-type ContentfulItem = Entry<any> | Asset;
-
-function isEntry(item: any): item is Entry<any> {
-  return item && typeof item === "object" && "fields" in item;
+interface Program {
+  title: string;
+  description: string;
+  imageUrl: string;
 }
 
-export function parseContentfulItems(items: unknown[]): Program[] {
-  return (items ?? [])
-    .filter(isEntry)
-    .map((item) => {
-      const description =
-        "description" in item.fields
-          ? String(item.fields.description ?? "")
-          : "";
+if (!process.env.CONTENTFUL_SPACE_ID || !process.env.CONTENTFUL_ACCESS_TOKEN) {
+  throw new Error('Contentful environment variables are missing');
+}
 
-      let imageUrl = "";
-      if ("image" in item.fields && item.fields.image && "fields" in item.fields.image) {
-        const file = (item.fields.image as Asset).fields.file;
-        if (file && "url" in file) {
-          imageUrl = `https:${String(file.url)}`;
-        }
-      }
+const client = createClient({
+  space: process.env.CONTENTFUL_SPACE_ID,
+  accessToken: process.env.CONTENTFUL_ACCESS_TOKEN,
+});
 
-      return {
-        description,
-        imageUrl,
-      };
-    });
+export async function getPrograms(): Promise<Program[]> {
+  const entries = await client.getEntries({ content_type: 'ourPrograms' });
+  return entries.items.map((item) => ({
+    title: String(item.fields.title ?? ''),
+    description: String(item.fields.description ?? ''),
+    imageUrl:
+      item.fields.image?.fields?.file?.url
+        ? 'https:' + String(item.fields.image.fields.file.url)
+        : '',
+  })) as Program[];
 }
